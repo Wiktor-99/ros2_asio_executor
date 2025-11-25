@@ -3,7 +3,7 @@
 <package format="3">
   <name>ros2_asio_executor</name>
   <version>0.1.0</version>
-  <description>ROS2 Executor with Boost.Asio integration for async operations</description>
+  <description>ROS2 Executor with Boost Asio integration for async operations</description>
   <maintainer email="wiktorbajor1@gmail.com">Wiktor Bajor</maintainer>
   <license>Apache-2.0</license>
 
