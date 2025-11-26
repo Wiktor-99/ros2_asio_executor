@@ -15,7 +15,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 ENV SHELL=/bin/bash
 RUN apt update && \
-    apt upgrade && \
+    apt upgrade -y && \
     apt install -y \
     ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
     ros-$ROS_DISTRO-cyclonedds \
