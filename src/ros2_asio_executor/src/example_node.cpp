@@ -32,7 +32,7 @@ public:
             status_msg.data = "Starting async task...";
             status_publisher_->publish(status_msg);
 
-            boost::asio::steady_timer timer(io_context_, 2s);
+            boost::asio::steady_timer timer(io_context_, 10s);
             co_await timer.async_wait(boost::asio::use_awaitable);
             counter_++;
             response->success = true;
@@ -46,6 +46,24 @@ public:
           },
           boost::asio::detached);
       });
+      another_async_task_service_ = this->create_service<std_srvs::srv::Trigger>(
+      "another_async_task",
+      [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
+             const std::shared_ptr<rmw_request_id_t> request_header,
+             const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
+
+        RCLCPP_INFO(this->get_logger(), "Received another_async_task service call");
+
+        boost::asio::co_spawn(
+          io_context_,
+          [this, service_handle, request_header]() -> boost::asio::awaitable<void> {
+            boost::asio::steady_timer timer(io_context_, 1s);
+            co_await timer.async_wait(boost::asio::use_awaitable);
+            auto response = std::make_shared<std_srvs::srv::Trigger::Response>();
+            service_handle->send_response(*request_header, *response);
+          },
+          boost::asio::detached);
+      });
     }
 
 private:
@@ -53,6 +71,7 @@ private:
 
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr status_publisher_;
   rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr async_task_service_;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr another_async_task_service_;
   int counter_;
 };
 
@@ -64,7 +83,5 @@ int main(int argc, char** argv) {
   executor->add_node(node);
   executor->spin();
   rclcpp::shutdown();
-
-  return 0;
 }
 
