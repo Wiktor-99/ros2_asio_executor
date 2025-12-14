@@ -32,10 +32,10 @@ public:
     }
     RCPPUTILS_SCOPE_EXIT(wait_result_.reset(); this->spinning.store(false); work_guard_.reset(););
 
-    this->wait_result_.reset();
-    this->entities_need_rebuild_ = true;
+    wait_result_.reset();
+    entities_need_rebuild_ = true;
 
-    while (rclcpp::ok(this->context_) && spinning.load()) {
+    while (rclcpp::ok(context_) && spinning.load()) {
       rclcpp::AnyExecutable any_executable;
       if (get_next_executable(any_executable, std::chrono::milliseconds(0))) {
         execute_any_executable(any_executable);

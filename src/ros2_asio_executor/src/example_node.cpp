@@ -14,14 +14,14 @@ class AsioExampleNode : public rclcpp::Node {
 public:
   AsioExampleNode(boost::asio::io_context& io_context)
     : Node("asio_example_node"), io_context_(io_context), counter_(0) {
-    status_publisher_ = this->create_publisher<std_msgs::msg::String>("status", 10);
-    async_task_service_ = this->create_service<std_srvs::srv::Trigger>(
+    status_publisher_ = create_publisher<std_msgs::msg::String>("status", 10);
+    async_task_service_ = create_service<std_srvs::srv::Trigger>(
       "async_task",
       [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
              const std::shared_ptr<rmw_request_id_t> request_header,
              const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
 
-        RCLCPP_INFO(this->get_logger(), "Received async_task service call");
+        RCLCPP_INFO(get_logger(), "Received async_task service call");
 
         boost::asio::co_spawn(
           io_context_,
@@ -38,7 +38,7 @@ public:
             response->success = true;
             response->message = "Async task completed successfully! Counter: " + std::to_string(counter_);
 
-            RCLCPP_INFO(this->get_logger(), "Async task completed: %s", response->message.c_str());
+            RCLCPP_INFO(get_logger(), "Async task completed: %s", response->message.c_str());
 
             status_msg.data = "Async task completed!";
             status_publisher_->publish(status_msg);
@@ -46,13 +46,13 @@ public:
           },
           boost::asio::detached);
       });
-      another_async_task_service_ = this->create_service<std_srvs::srv::Trigger>(
+      another_async_task_service_ = create_service<std_srvs::srv::Trigger>(
       "another_async_task",
       [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
              const std::shared_ptr<rmw_request_id_t> request_header,
              const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
 
-        RCLCPP_INFO(this->get_logger(), "Received another_async_task service call");
+        RCLCPP_INFO(get_logger(), "Received another_async_task service call");
 
         boost::asio::co_spawn(
           io_context_,
