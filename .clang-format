@@ -1,0 +1,23 @@
+BasedOnStyle: chromium
+
+ColumnLimit: 140
+
+IndentWidth: 2
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+
+AccessModifierOffset: -2
+
+PointerAlignment: Left
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '<[a-z_]+>'
+    Priority:        1
+  - Regex:           '<[[:alnum:]_.]+'
+    Priority:        2
+  - Regex:           '"[[:alnum:].]+'
+    Priority:        3
+  - Regex:           '.*'
+    Priority:        4
+SortIncludes: true

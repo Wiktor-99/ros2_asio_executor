@@ -1,26 +1,24 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include "rclcpp/rclcpp.hpp"
-#include "std_srvs/srv/trigger.hpp"
-#include "std_srvs/srv/set_bool.hpp"
-#include "std_msgs/msg/string.hpp"
-#include "ros2_asio_executor/asio_single_threaded_executor.hpp"
+
 #include <boost/asio.hpp>
+
+#include "rclcpp/rclcpp.hpp"
+#include "ros2_asio_executor/asio_single_threaded_executor.hpp"
+#include "std_msgs/msg/string.hpp"
+#include "std_srvs/srv/set_bool.hpp"
+#include "std_srvs/srv/trigger.hpp"
 
 using namespace std::chrono_literals;
 
 class AsioExampleNode : public rclcpp::Node {
 public:
-  AsioExampleNode(boost::asio::io_context& io_context)
-    : Node("asio_example_node"), io_context_(io_context), counter_(0) {
+  AsioExampleNode(boost::asio::io_context& io_context) : Node("asio_example_node"), io_context_(io_context), counter_(0) {
     status_publisher_ = create_publisher<std_msgs::msg::String>("status", 10);
     async_task_service_ = create_service<std_srvs::srv::Trigger>(
-      "async_task",
-      [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
-             const std::shared_ptr<rmw_request_id_t> request_header,
-             const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
-
+      "async_task", [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
+                           const std::shared_ptr<rmw_request_id_t> request_header, const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
         RCLCPP_INFO(get_logger(), "Received async_task service call");
 
         boost::asio::co_spawn(
@@ -46,12 +44,10 @@ public:
           },
           boost::asio::detached);
       });
-      another_async_task_service_ = create_service<std_srvs::srv::Trigger>(
+    another_async_task_service_ = create_service<std_srvs::srv::Trigger>(
       "another_async_task",
       [this](const std::shared_ptr<rclcpp::Service<std_srvs::srv::Trigger>> service_handle,
-             const std::shared_ptr<rmw_request_id_t> request_header,
-             const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
-
+             const std::shared_ptr<rmw_request_id_t> request_header, const std::shared_ptr<std_srvs::srv::Trigger::Request>) {
         RCLCPP_INFO(get_logger(), "Received another_async_task service call");
 
         boost::asio::co_spawn(
@@ -64,7 +60,7 @@ public:
           },
           boost::asio::detached);
       });
-    }
+  }
 
 private:
   boost::asio::io_context& io_context_;
@@ -84,4 +80,3 @@ int main(int argc, char** argv) {
   executor->spin();
   rclcpp::shutdown();
 }
-
