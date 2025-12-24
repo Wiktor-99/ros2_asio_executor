@@ -1,4 +1,4 @@
-FROM osrf/ros:jazzy-desktop-full-noble
+FROM ros:jazzy-ros-base
 ARG ROS_DISTRO=jazzy
 ARG USERNAME=ros
 ARG USER_UID=1000
@@ -32,7 +32,9 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
     update-alternatives --config gcc && \
     update-alternatives --config g++
 
-ARG WORKSPACE
-RUN echo "source /opt/ros/jazzy/setup.bash" >> home/$USERNAME/.bashrc && \
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> home/$USERNAME/.bashrc && \
     echo "if [ -f /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash ]; then source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash; fi" >> /home/$USERNAME/.bashrc && \
     echo "if [ -f ${WORKSPACE}/install/setup.bash ]; then source ${WORKSPACE}/install/setup.bash; fi" >> /home/$USERNAME/.bashrc
+ENV DEBIAN_FRONTEND=interactive
+
+ARG WORKSPACE
